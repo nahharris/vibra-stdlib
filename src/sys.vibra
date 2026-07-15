@@ -9,7 +9,7 @@ info:
   do:
     - $wasm:
         import:
-          module: wasi_snapshot_preview1
+          module: vibra_v1
           name: system_info
         args:
           - $const.0

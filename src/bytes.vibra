@@ -8,7 +8,7 @@ bytes:
       do:
         - $wasm:
             import:
-              module: wasi_snapshot_preview1
+              module: vibra_v1
               name: bytes_len
             args:
               - $args.self
@@ -21,7 +21,7 @@ bytes:
       do:
         - $wasm:
             import:
-              module: wasi_snapshot_preview1
+              module: vibra_v1
               name: bytes_slice
             args:
               - $args.self
@@ -34,7 +34,7 @@ bytes:
       do:
         - $wasm:
             import:
-              module: wasi_snapshot_preview1
+              module: vibra_v1
               name: bytes_from_str
             args:
               - $args.input
@@ -44,7 +44,7 @@ bytes:
       do:
         - $wasm:
             import:
-              module: wasi_snapshot_preview1
+              module: vibra_v1
               name: bytes_to_str
             args:
               - $args.self

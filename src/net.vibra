@@ -21,7 +21,7 @@ connect:
   do:
     - $wasm:
         import:
-          module: wasi_snapshot_preview1
+          module: vibra_v1
           name: net_connect
         args:
           - $args.input
@@ -38,7 +38,7 @@ listen:
   do:
     - $wasm:
         import:
-          module: wasi_snapshot_preview1
+          module: vibra_v1
           name: net_listen
         args:
           - $args.input

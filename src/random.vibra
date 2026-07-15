@@ -13,7 +13,7 @@ bytes:
   do:
     - $wasm:
         import:
-          module: wasi_snapshot_preview1
+          module: vibra_v1
           name: random_get
         args:
           - $args.input

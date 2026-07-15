@@ -21,7 +21,7 @@ run:
   do:
     - $wasm:
         import:
-          module: wasi_snapshot_preview1
+          module: vibra_v1
           name: process_run
         args:
           - $args.input
