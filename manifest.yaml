@@ -1,0 +1,6 @@
+manifest-version: 1
+name: vibra-stdlib
+version: 0.1.0
+runtime-abi: vibra-v1
+source-repository: https://github.com/nahharris/vibra-stdlib
+

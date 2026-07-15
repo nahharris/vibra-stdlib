@@ -1,0 +1,9 @@
+manifest-version: 1
+package:
+  name: std
+  version: 0.1.0
+targets:
+  libs:
+    - name: std
+      root: src
+      entry: lib.vibra
