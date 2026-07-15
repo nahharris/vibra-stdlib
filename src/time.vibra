@@ -9,7 +9,7 @@ now-unix-millis:
   do:
     - $wasm:
         import:
-          module: wasi_snapshot_preview1
+          module: vibra_v1
           name: clock_time_get
         args:
           - $const.0

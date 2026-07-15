@@ -20,7 +20,7 @@ path:
       do:
         - $wasm:
             import:
-              module: wasi_snapshot_preview1
+              module: vibra_v1
               name: path_new
             args:
               - $args.input
@@ -32,7 +32,7 @@ path:
       do:
         - $wasm:
             import:
-              module: wasi_snapshot_preview1
+              module: vibra_v1
               name: path_join
             args:
               - $args.self
@@ -45,7 +45,7 @@ path:
       do:
         - $wasm:
             import:
-              module: wasi_snapshot_preview1
+              module: vibra_v1
               name: path_parent
             args:
               - $args.self
@@ -57,7 +57,7 @@ path:
       do:
         - $wasm:
             import:
-              module: wasi_snapshot_preview1
+              module: vibra_v1
               name: path_extension
             args:
               - $args.self
@@ -174,7 +174,7 @@ read-file:
         do:
           - $wasm:
                 import:
-                  module: wasi_snapshot_preview1
+                  module: vibra_v1
                   name: fd_read
                 args:
                   - $args.self
@@ -187,7 +187,7 @@ read-file:
         do:
           - $wasm:
                 import:
-                  module: wasi_snapshot_preview1
+                  module: vibra_v1
                   name: fd_read
                 args:
                   - $args.self
@@ -201,7 +201,7 @@ read-file:
         do:
           - $wasm:
                 import:
-                  module: wasi_snapshot_preview1
+                  module: vibra_v1
                   name: fd_close
                 args:
                   - $args.self
@@ -221,7 +221,7 @@ write-file:
         do:
           - $wasm:
                 import:
-                  module: wasi_snapshot_preview1
+                  module: vibra_v1
                   name: fd_write
                 args:
                   - $args.self
@@ -237,7 +237,7 @@ write-file:
         do:
           - $wasm:
                 import:
-                  module: wasi_snapshot_preview1
+                  module: vibra_v1
                   name: fd_write
                 args:
                   - $args.self
@@ -251,7 +251,7 @@ write-file:
         do:
           - $wasm:
                 import:
-                  module: wasi_snapshot_preview1
+                  module: vibra_v1
                   name: fd_sync
                 args:
                   - $args.self
@@ -265,7 +265,7 @@ write-file:
         do:
           - $wasm:
                 import:
-                  module: wasi_snapshot_preview1
+                  module: vibra_v1
                   name: fd_close
                 args:
                   - $args.self
@@ -285,7 +285,7 @@ append-file:
         do:
           - $wasm:
                 import:
-                  module: wasi_snapshot_preview1
+                  module: vibra_v1
                   name: fd_write
                 args:
                   - $args.self
@@ -301,7 +301,7 @@ append-file:
         do:
           - $wasm:
                 import:
-                  module: wasi_snapshot_preview1
+                  module: vibra_v1
                   name: fd_write
                 args:
                   - $args.self
@@ -315,7 +315,7 @@ append-file:
         do:
           - $wasm:
                 import:
-                  module: wasi_snapshot_preview1
+                  module: vibra_v1
                   name: fd_sync
                 args:
                   - $args.self
@@ -331,7 +331,7 @@ append-file:
         do:
           - $wasm:
                 import:
-                  module: wasi_snapshot_preview1
+                  module: vibra_v1
                   name: fd_write
                 args:
                   - $args.self
@@ -347,7 +347,7 @@ append-file:
         do:
           - $wasm:
                 import:
-                  module: wasi_snapshot_preview1
+                  module: vibra_v1
                   name: fd_write
                 args:
                   - $args.self
@@ -362,7 +362,7 @@ append-file:
         do:
           - $wasm:
                 import:
-                  module: wasi_snapshot_preview1
+                  module: vibra_v1
                   name: fd_close
                 args:
                   - $args.self
@@ -380,7 +380,7 @@ read-write-file:
         do:
           - $wasm:
                 import:
-                  module: wasi_snapshot_preview1
+                  module: vibra_v1
                   name: fd_read
                 args:
                   - $args.self
@@ -393,7 +393,7 @@ read-write-file:
         do:
           - $wasm:
                 import:
-                  module: wasi_snapshot_preview1
+                  module: vibra_v1
                   name: fd_read
                 args:
                   - $args.self
@@ -409,7 +409,7 @@ read-write-file:
         do:
           - $wasm:
                 import:
-                  module: wasi_snapshot_preview1
+                  module: vibra_v1
                   name: fd_write
                 args:
                   - $args.self
@@ -425,7 +425,7 @@ read-write-file:
         do:
           - $wasm:
                 import:
-                  module: wasi_snapshot_preview1
+                  module: vibra_v1
                   name: fd_write
                 args:
                   - $args.self
@@ -439,7 +439,7 @@ read-write-file:
         do:
           - $wasm:
                 import:
-                  module: wasi_snapshot_preview1
+                  module: vibra_v1
                   name: fd_sync
                 args:
                   - $args.self
@@ -453,7 +453,7 @@ read-write-file:
         do:
           - $wasm:
                 import:
-                  module: wasi_snapshot_preview1
+                  module: vibra_v1
                   name: fd_close
                 args:
                   - $args.self
@@ -474,7 +474,7 @@ open-read:
   do:
     - $wasm:
         import:
-          module: wasi_snapshot_preview1
+          module: vibra_v1
           name: path_open
         args:
           - $args.input
@@ -495,7 +495,7 @@ open-write:
   do:
     - $wasm:
         import:
-          module: wasi_snapshot_preview1
+          module: vibra_v1
           name: path_open
         args:
           - $args.input
@@ -516,7 +516,7 @@ open-append:
   do:
     - $wasm:
         import:
-          module: wasi_snapshot_preview1
+          module: vibra_v1
           name: path_open
         args:
           - $args.input
@@ -540,7 +540,7 @@ open-read-write:
   do:
     - $wasm:
         import:
-          module: wasi_snapshot_preview1
+          module: vibra_v1
           name: path_open
         args:
           - $args.input
@@ -561,7 +561,7 @@ read-to-string:
   do:
     - $wasm:
         import:
-          module: wasi_snapshot_preview1
+          module: vibra_v1
           name: read_to_string
         args:
           - $args.input
@@ -580,7 +580,7 @@ write-string-all:
   do:
     - $wasm:
         import:
-          module: wasi_snapshot_preview1
+          module: vibra_v1
           name: write_string_all
         args:
           - $args.input
@@ -600,7 +600,7 @@ append-string:
   do:
     - $wasm:
         import:
-          module: wasi_snapshot_preview1
+          module: vibra_v1
           name: append_string
         args:
           - $args.input
@@ -615,7 +615,7 @@ exists:
   do:
     - $wasm:
         import:
-          module: wasi_snapshot_preview1
+          module: vibra_v1
           name: path_filestat_get
         args:
           - $args.input
@@ -632,7 +632,7 @@ create-dir-all:
   do:
     - $wasm:
         import:
-          module: wasi_snapshot_preview1
+          module: vibra_v1
           name: path_create_directory
         args:
           - $args.input
@@ -649,7 +649,7 @@ remove-file:
   do:
     - $wasm:
         import:
-          module: wasi_snapshot_preview1
+          module: vibra_v1
           name: path_unlink_file
         args:
           - $args.input
@@ -666,7 +666,7 @@ remove-dir:
   do:
     - $wasm:
         import:
-          module: wasi_snapshot_preview1
+          module: vibra_v1
           name: path_remove_directory
         args:
           - $args.input
@@ -684,7 +684,7 @@ read-dir:
   do:
     - $wasm:
         import:
-          module: wasi_snapshot_preview1
+          module: vibra_v1
           name: fd_readdir
         args:
           - $args.input
@@ -701,7 +701,7 @@ metadata:
   do:
     - $wasm:
         import:
-          module: wasi_snapshot_preview1
+          module: vibra_v1
           name: path_filestat_get
         args:
           - $args.input
@@ -718,7 +718,7 @@ canonicalize:
   do:
     - $wasm:
         import:
-          module: wasi_snapshot_preview1
+          module: vibra_v1
           name: path_filestat_get
         args:
           - $args.input
