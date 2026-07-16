@@ -1,15 +1,13 @@
-security:
-  $import: ./security.vibra
-
+capability:
+  $capability.clock: null
 now-unix-millis:
-  $function: $void
-  grants:
-    clock: $security.grant.mandatory
+  $function:
+    capability: $capability
   return: $uint64
   do:
-    - $wasm:
-        import:
-          module: vibra_v1
-          name: clock_time_get
-        args:
-          - $const.0
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: clock_now_unix_millis
+      args:
+      - $args.capability

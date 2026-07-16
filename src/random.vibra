@@ -1,19 +1,18 @@
-security:
-  $import: ./security.vibra
-
 bytes-lib:
   $import: ./bytes.vibra
-
+capability:
+  $capability.random: null
 bytes:
   $function:
     input: $uint64
-  grants:
-    random: $security.grant.mandatory
+  args:
+    capability: $capability
   return: $bytes-lib.bytes
   do:
-    - $wasm:
-        import:
-          module: vibra_v1
-          name: random_get
-        args:
-          - $args.input
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: random_bytes
+      args:
+      - $args.input
+      - $args.capability

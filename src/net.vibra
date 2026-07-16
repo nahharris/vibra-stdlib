@@ -1,44 +1,44 @@
-security:
-  $import: ./security.vibra
-
 result:
   $import: ./result.vibra
-
 net-error:
   $enum:
     permission-denied: $void
     unsupported: $str
-
+connect-capability:
+  $capability.net-connect: null
+listen-capability:
+  $capability.net-listen: null
 connect:
   $function:
     input: $str
-  grants:
-    net-connect: $security.grant.mandatory
+  args:
+    capability: $connect-capability
   return:
     $result.result:
       t: $void
       e: $net-error
   do:
-    - $wasm:
-        import:
-          module: vibra_v1
-          name: net_connect
-        args:
-          - $args.input
-
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: net_connect
+      args:
+      - $args.input
+      - $args.capability
 listen:
   $function:
     input: $str
-  grants:
-    net-listen: $security.grant.mandatory
+  args:
+    capability: $listen-capability
   return:
     $result.result:
       t: $void
       e: $net-error
   do:
-    - $wasm:
-        import:
-          module: vibra_v1
-          name: net_listen
-        args:
-          - $args.input
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: net_listen
+      args:
+      - $args.input
+      - $args.capability
