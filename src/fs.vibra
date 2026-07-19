@@ -63,6 +63,8 @@ fs-error:
     is-dir: $void
     not-dir: $void
     invalid-path: $void
+    invalid-handle: $void
+    resource-closed: $void
     too-many-open-files: $void
     io: $str
 read-capability:
