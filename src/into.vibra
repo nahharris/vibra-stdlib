@@ -1,10 +1,10 @@
 into:
-    $interface:
-        into:
-            $fn-type:
-                args:
-                    $record:
-                        self: $self
-                return: $t
-    =where:
-        t: []
+  $interface:
+    into:
+      $fn-type:
+        args:
+          $record:
+            self: $self
+        return: $t
+  =where:
+    t: []

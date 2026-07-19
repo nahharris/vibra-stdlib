@@ -1,0 +1,98 @@
+result:
+  $import: ./result.vibra
+parse-error:
+  $enum:
+    invalid: $void
+    overflow: $void
+parse-int64:
+  $function: $str
+  return:
+    $result.result:
+      t: $int64
+      e: $parse-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: parse_int64
+      args:
+      - $args.value
+parse-uint64:
+  $function: $str
+  return:
+    $result.result:
+      t: $uint64
+      e: $parse-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: parse_uint64
+      args:
+      - $args.value
+parse-float64:
+  $function: $str
+  return:
+    $result.result:
+      t: $float64
+      e: $parse-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: parse_float64
+      args:
+      - $args.value
+parse-bool:
+  $function: $str
+  return:
+    $result.result:
+      t: $bool
+      e: $parse-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: parse_bool
+      args:
+      - $args.value
+format-int64:
+  $function: $int64
+  return: $str
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: format_int64
+      args:
+      - $args.value
+format-uint64:
+  $function: $uint64
+  return: $str
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: format_uint64
+      args:
+      - $args.value
+format-float64:
+  $function: $float64
+  return: $str
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: format_float64
+      args:
+      - $args.value
+format-bool:
+  $function: $bool
+  return: $str
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: format_bool
+      args:
+      - $args.value

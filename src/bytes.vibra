@@ -1,3 +1,12 @@
+option:
+  $import: ./option.vibra
+result:
+  $import: ./result.vibra
+bytes-error:
+  $enum:
+    invalid-byte: $void
+    invalid-utf8: $void
+    limit-exceeded: $void
 bytes:
   $newtype:
     $array: $uint8
@@ -6,12 +15,12 @@ bytes:
       $function: $self
       return: $uint64
       do:
-        - $wasm:
-            import:
-              module: vibra_v1
-              name: bytes_len
-            args:
-              - $args.self
+      - $wasm:
+          import:
+            module: vibra_v1
+            name: bytes_len
+          args:
+          - $args.self
     slice:
       $function: $self
       args:
@@ -19,32 +28,96 @@ bytes:
         end: $uint64
       return: $self
       do:
-        - $wasm:
-            import:
-              module: vibra_v1
-              name: bytes_slice
-            args:
-              - $args.self
-              - $args.start
-              - $args.end
+      - $wasm:
+          import:
+            module: vibra_v1
+            name: bytes_slice
+          args:
+          - $args.self
+          - $args.start
+          - $args.end
     from-str:
       $function:
         input: $str
       return: $self
       do:
-        - $wasm:
-            import:
-              module: vibra_v1
-              name: bytes_from_str
-            args:
-              - $args.input
-    to-str:
+      - $wasm:
+          import:
+            module: vibra_v1
+            name: bytes_from_str
+          args:
+          - $args.input
+    decode-utf8:
       $function: $self
-      return: $str
+      return:
+        $result.result:
+          t: $str
+          e: $bytes-error
       do:
-        - $wasm:
-            import:
-              module: vibra_v1
-              name: bytes_to_str
-            args:
-              - $args.self
+      - $wasm:
+          import:
+            module: vibra_v1
+            name: bytes_decode_utf8
+          args:
+          - $args.self
+    get:
+      $function: $self
+      args:
+        index: $uint64
+      return:
+        $option.option:
+          t: $uint8
+      do:
+      - $wasm:
+          import:
+            module: vibra_v1
+            name: bytes_get
+          args:
+          - $args.self
+          - $args.index
+    concat:
+      $function: $self
+      args:
+        other: $self
+      return:
+        $result.result:
+          t: $self
+          e: $bytes-error
+      do:
+      - $wasm:
+          import:
+            module: vibra_v1
+            name: bytes_concat
+          args:
+          - $args.self
+          - $args.other
+    find:
+      $function: $self
+      args:
+        needle: $self
+      return:
+        $option.option:
+          t: $uint64
+      do:
+      - $wasm:
+          import:
+            module: vibra_v1
+            name: bytes_find
+          args:
+          - $args.self
+          - $args.needle
+    from-array:
+      $function:
+        values:
+          $array: $uint8
+      return:
+        $result.result:
+          t: $self
+          e: $bytes-error
+      do:
+      - $wasm:
+          import:
+            module: vibra_v1
+            name: bytes_from_array
+          args:
+          - $args.values

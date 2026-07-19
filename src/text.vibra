@@ -1,0 +1,199 @@
+option:
+  $import: ./option.vibra
+result:
+  $import: ./result.vibra
+text-error:
+  $enum:
+    empty-pattern: $void
+    limit-exceeded: $void
+scalar-len:
+  $function: $str
+  return: $uint64
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: str_scalar_len
+      args:
+      - $args.value
+byte-len:
+  $function: $str
+  return: $uint64
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: str_byte_len
+      args:
+      - $args.value
+is-empty:
+  $function: $str
+  return: $bool
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: str_is_empty
+      args:
+      - $args.value
+contains:
+  $function: $str
+  args:
+    needle: $str
+  return: $bool
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: str_contains
+      args:
+      - $args.value
+      - $args.needle
+starts-with:
+  $function: $str
+  args:
+    prefix: $str
+  return: $bool
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: str_starts_with
+      args:
+      - $args.value
+      - $args.prefix
+ends-with:
+  $function: $str
+  args:
+    suffix: $str
+  return: $bool
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: str_ends_with
+      args:
+      - $args.value
+      - $args.suffix
+find:
+  $function: $str
+  args:
+    needle: $str
+  return:
+    $option.option:
+      t: $uint64
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: str_find
+      args:
+      - $args.value
+      - $args.needle
+scalar-at:
+  $function: $str
+  args:
+    index: $uint64
+  return:
+    $option.option:
+      t: $str
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: str_scalar_at
+      args:
+      - $args.value
+      - $args.index
+split:
+  $function: $str
+  args:
+    separator: $str
+  return:
+    $result.result:
+      t:
+        $array: $str
+      e: $text-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: str_split
+      args:
+      - $args.value
+      - $args.separator
+trim:
+  $function: $str
+  return:
+    $result.result:
+      t: $str
+      e: $text-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: str_trim
+      args:
+      - $args.value
+replace:
+  $function: $str
+  args:
+    from: $str
+    to: $str
+  return:
+    $result.result:
+      t: $str
+      e: $text-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: str_replace
+      args:
+      - $args.value
+      - $args.from
+      - $args.to
+join:
+  $function:
+    values:
+      $array: $str
+  args:
+    separator: $str
+  return:
+    $result.result:
+      t: $str
+      e: $text-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: str_join
+      args:
+      - $args.values
+      - $args.separator
+lowercase:
+  $function: $str
+  return:
+    $result.result:
+      t: $str
+      e: $text-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: str_lowercase
+      args:
+      - $args.value
+uppercase:
+  $function: $str
+  return:
+    $result.result:
+      t: $str
+      e: $text-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: str_uppercase
+      args:
+      - $args.value

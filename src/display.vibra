@@ -1,0 +1,16 @@
+display:
+  $interface:
+    display:
+      $fn-type:
+        args:
+          $record:
+            self: $self
+        return: $str
+debug:
+  $interface:
+    debug:
+      $fn-type:
+        args:
+          $record:
+            self: $self
+        return: $str
