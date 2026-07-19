@@ -7,7 +7,8 @@ text-error:
     empty-pattern: $void
     limit-exceeded: $void
 scalar-len:
-  $function: $str
+  $function:
+    value: $str
   return: $uint64
   do:
   - $wasm:
@@ -17,7 +18,8 @@ scalar-len:
       args:
       - $args.value
 byte-len:
-  $function: $str
+  $function:
+    value: $str
   return: $uint64
   do:
   - $wasm:
@@ -27,7 +29,8 @@ byte-len:
       args:
       - $args.value
 is-empty:
-  $function: $str
+  $function:
+    value: $str
   return: $bool
   do:
   - $wasm:
@@ -37,7 +40,8 @@ is-empty:
       args:
       - $args.value
 contains:
-  $function: $str
+  $function:
+    value: $str
   args:
     needle: $str
   return: $bool
@@ -50,7 +54,8 @@ contains:
       - $args.value
       - $args.needle
 starts-with:
-  $function: $str
+  $function:
+    value: $str
   args:
     prefix: $str
   return: $bool
@@ -63,7 +68,8 @@ starts-with:
       - $args.value
       - $args.prefix
 ends-with:
-  $function: $str
+  $function:
+    value: $str
   args:
     suffix: $str
   return: $bool
@@ -76,7 +82,8 @@ ends-with:
       - $args.value
       - $args.suffix
 find:
-  $function: $str
+  $function:
+    value: $str
   args:
     needle: $str
   return:
@@ -91,7 +98,8 @@ find:
       - $args.value
       - $args.needle
 scalar-at:
-  $function: $str
+  $function:
+    value: $str
   args:
     index: $uint64
   return:
@@ -106,7 +114,8 @@ scalar-at:
       - $args.value
       - $args.index
 split:
-  $function: $str
+  $function:
+    value: $str
   args:
     separator: $str
   return:
@@ -123,7 +132,8 @@ split:
       - $args.value
       - $args.separator
 trim:
-  $function: $str
+  $function:
+    value: $str
   return:
     $result.result:
       t: $str
@@ -136,7 +146,8 @@ trim:
       args:
       - $args.value
 replace:
-  $function: $str
+  $function:
+    value: $str
   args:
     from: $str
     to: $str
@@ -172,7 +183,8 @@ join:
       - $args.values
       - $args.separator
 lowercase:
-  $function: $str
+  $function:
+    value: $str
   return:
     $result.result:
       t: $str
@@ -185,7 +197,8 @@ lowercase:
       args:
       - $args.value
 uppercase:
-  $function: $str
+  $function:
+    value: $str
   return:
     $result.result:
       t: $str
