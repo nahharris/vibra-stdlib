@@ -1,0 +1,297 @@
+option:
+  $import: ./option.vibra
+result:
+  $import: ./result.vibra
+collection-error:
+  $enum:
+    out-of-bounds:
+      $record:
+        index: $uint64
+        len: $uint64
+    limit-exceeded: $void
+array:
+  $array: $t
+  =where:
+    t: []
+string-map:
+  $map:
+    key: $str
+    value: $v
+  =where:
+    v: []
+removed-array:
+  $record:
+    values:
+      $array: $t
+    removed: $t
+  =where:
+    t: []
+array-len:
+  $function:
+    values:
+      $array: $t
+  return: $uint64
+  =where:
+    t: []
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: array_len
+      args:
+      - $args.values
+array-get:
+  $function:
+    values:
+      $array: $t
+  args:
+    index: $uint64
+  return:
+    $option.option:
+      t: $t
+  =where:
+    t: []
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: array_get
+      args:
+      - $args.values
+      - $args.index
+array-set:
+  $function:
+    values:
+      $array: $t
+  args:
+    index: $uint64
+    value: $t
+  return:
+    $result.result:
+      t:
+        $array: $t
+      e: $collection-error
+  =where:
+    t: []
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: array_set
+      args:
+      - $args.values
+      - $args.index
+      - $args.value
+array-slice:
+  $function:
+    values:
+      $array: $t
+  args:
+    start: $uint64
+    end: $uint64
+  return:
+    $result.result:
+      t:
+        $array: $t
+      e: $collection-error
+  =where:
+    t: []
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: array_slice
+      args:
+      - $args.values
+      - $args.start
+      - $args.end
+array-append:
+  $function:
+    values:
+      $array: $t
+  args:
+    value: $t
+  return:
+    $result.result:
+      t:
+        $array: $t
+      e: $collection-error
+  =where:
+    t: []
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: array_append
+      args:
+      - $args.values
+      - $args.value
+array-insert:
+  $function:
+    values:
+      $array: $t
+  args:
+    index: $uint64
+    value: $t
+  return:
+    $result.result:
+      t:
+        $array: $t
+      e: $collection-error
+  =where:
+    t: []
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: array_insert
+      args:
+      - $args.values
+      - $args.index
+      - $args.value
+array-remove:
+  $function:
+    values:
+      $array: $t
+  args:
+    index: $uint64
+  return:
+    $result.result:
+      t:
+        $removed-array:
+          t: $t
+      e: $collection-error
+  =where:
+    t: []
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: array_remove
+      args:
+      - $args.values
+      - $args.index
+array-contains:
+  $function:
+    values:
+      $array: $t
+  args:
+    value: $t
+  return: $bool
+  =where:
+    t: []
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: array_contains
+      args:
+      - $args.values
+      - $args.value
+map-len:
+  $function:
+    values:
+      $map:
+        key: $str
+        value: $v
+  return: $uint64
+  =where:
+    v: []
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: map_len
+      args:
+      - $args.values
+map-get:
+  $function:
+    values:
+      $map:
+        key: $str
+        value: $v
+  args:
+    key: $str
+  return:
+    $option.option:
+      t: $v
+  =where:
+    v: []
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: map_get
+      args:
+      - $args.values
+      - $args.key
+map-insert:
+  $function:
+    values:
+      $map:
+        key: $str
+        value: $v
+  args:
+    key: $str
+    value: $v
+  return:
+    $result.result:
+      t:
+        $map:
+          key: $str
+          value: $v
+      e: $collection-error
+  =where:
+    v: []
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: map_insert
+      args:
+      - $args.values
+      - $args.key
+      - $args.value
+map-remove:
+  $function:
+    values:
+      $map:
+        key: $str
+        value: $v
+  args:
+    key: $str
+  return:
+    $option.option:
+      t:
+        $map:
+          key: $str
+          value: $v
+  =where:
+    v: []
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: map_remove
+      args:
+      - $args.values
+      - $args.key
+map-contains-key:
+  $function:
+    values:
+      $map:
+        key: $str
+        value: $v
+  args:
+    key: $str
+  return: $bool
+  =where:
+    v: []
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: map_contains_key
+      args:
+      - $args.values
+      - $args.key
