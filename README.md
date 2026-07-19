@@ -31,6 +31,12 @@ repository with `cargo run -- test`. Changes to this repository must update the
 matching `tests/stdlib-*.vibra` coverage there until the suite is migrated into
 this repository.
 
+## Collections
+
+`src/collections.vibra` provides the canonical v1 array and string-key map
+operations. Updates return copied values, lookup misses are optional, invalid
+bounds and allocation limits are typed errors, and map order is deterministic.
+
 ## License
 
 Licensed under either Apache-2.0 or MIT, at your option.

@@ -2,6 +2,8 @@ bytes:
   $import: ./bytes.vibra
 code:
   $import: ./code.vibra
+collections:
+  $import: ./collections.vibra
 env:
   $import: ./env.vibra
 from:
