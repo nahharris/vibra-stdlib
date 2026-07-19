@@ -37,6 +37,16 @@ this repository.
 operations. Updates return copied values, lookup misses are optional, invalid
 bounds and allocation limits are typed errors, and map order is deterministic.
 
+## Text, bytes, and conversion
+
+`src/text.vibra` treats `$str` as valid UTF-8 and uses Unicode-scalar offsets,
+matching `$for`; byte lengths are named explicitly. Growing transformations
+return typed allocation-limit errors. `src/bytes.vibra` provides safe lookup,
+construction, concatenation, search, and non-lossy UTF-8 decoding.
+`src/convert.vibra` provides strict typed primitive parsing and deterministic,
+locale-free formatting. `src/display.vibra` defines separate display/debug
+contracts without adding implicit interpolation.
+
 ## License
 
 Licensed under either Apache-2.0 or MIT, at your option.

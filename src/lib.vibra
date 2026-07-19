@@ -4,6 +4,10 @@ code:
   $import: ./code.vibra
 collections:
   $import: ./collections.vibra
+convert:
+  $import: ./convert.vibra
+display:
+  $import: ./display.vibra
 env:
   $import: ./env.vibra
 from:
@@ -28,5 +32,7 @@ sys:
   $import: ./sys.vibra
 test:
   $import: ./test.vibra
+text:
+  $import: ./text.vibra
 time:
   $import: ./time.vibra

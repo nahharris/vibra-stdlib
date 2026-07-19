@@ -2,4 +2,5 @@ option:
   $enum:
     some: $t
     none: $void
-  =where: {t: []}
+  =where:
+    t: []
