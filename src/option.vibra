@@ -4,3 +4,87 @@ option:
     none: $void
   =where:
     t: []
+from-value:
+  $function:
+    input: $t
+  return:
+    $option:
+      t: $t
+  =where:
+    t: []
+  do:
+  - $return:
+      $option.some: $args.input
+empty:
+  $function:
+    ignored: $bool
+  return:
+    $option:
+      t: $t
+  =where:
+    t: []
+  do:
+  - $return:
+      $option.none: null
+is-some:
+  $function:
+    input:
+      $option:
+        t: $t
+  return: $bool
+  =where:
+    t: []
+  do:
+  - $match: $args.input
+    when:
+    - case:
+        $option.some:
+          $bind: ignored-value
+      do:
+      - $return: true
+    - case:
+        $option.none: null
+      do:
+      - $return: false
+is-none:
+  $function:
+    input:
+      $option:
+        t: $t
+  return: $bool
+  =where:
+    t: []
+  do:
+  - $match: $args.input
+    when:
+    - case:
+        $option.some:
+          $bind: ignored-value
+      do:
+      - $return: false
+    - case:
+        $option.none: null
+      do:
+      - $return: true
+unwrap-or:
+  $function:
+    input:
+      $option:
+        t: $t
+  args:
+    default: $t
+  return: $t
+  =where:
+    t: []
+  do:
+  - $match: $args.input
+    when:
+    - case:
+        $option.some:
+          $bind: value
+      do:
+      - $return: $value
+    - case:
+        $option.none: null
+      do:
+      - $return: $args.default

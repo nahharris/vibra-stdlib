@@ -1,21 +1,228 @@
+bytes-lib:
+  $import: ./bytes.vibra
 result:
   $import: ./result.vibra
+error-lib:
+  $import: ./error.vibra
+option:
+  $import: ./option.vibra
+time:
+  $import: ./time.vibra
+fs:
+  $import: ./fs.vibra
 net-error:
   $enum:
     permission-denied: $void
-    unsupported: $str
+    invalid-address: $str
+    dns-failed: $str
+    address-in-use: $str
+    address-not-available: $str
+    connection-refused: $str
+    connection-reset: $str
+    connection-aborted: $str
+    not-connected: $str
+    timed-out: $str
+    would-block: $str
+    invalid-input: $str
+    invalid-handle: $void
+    resource-closed: $void
+    resource-limit: $str
+    invalid-length: $str
+    too-large: $str
+    io: $str
+  =impl:
+    $error-lib.error:
+      kind:
+        $function: $self
+        return: $error-lib.error-kind
+        do:
+        - $match: $args.self
+          when:
+          - case:
+              $net-error.permission-denied: null
+            do:
+            - $return:
+                $error-lib.error-kind.permission-denied: null
+          - case:
+              $net-error.invalid-address:
+                $wildcard: null
+            do:
+            - $return:
+                $error-lib.error-kind.invalid-input: null
+          - case:
+              $net-error.invalid-input:
+                $wildcard: null
+            do:
+            - $return:
+                $error-lib.error-kind.invalid-input: null
+          - case:
+              $net-error.resource-closed: null
+            do:
+            - $return:
+                $error-lib.error-kind.resource-closed: null
+          - case:
+              $net-error.resource-limit:
+                $wildcard: null
+            do:
+            - $return:
+                $error-lib.error-kind.resource-exhausted: null
+          - case:
+              $wildcard: null
+            do:
+            - $return:
+                $error-lib.error-kind.io: null
+      display:
+        $function: $self
+        return: $str
+        do:
+        - $return: network operation failed
+      context:
+        $function: $self
+        return:
+          $option.option:
+            t: $error-lib.context
+        do:
+        - $return:
+            $option.option.some:
+              $record:
+                kind:
+                  $error-lib.error-kind.io: null
+                operation: network
+                message: network operation failed
+                source:
+                  $option.option.some: network operation failed
 connect-capability:
   $capability.net-connect: null
 listen-capability:
   $capability.net-listen: null
-connect:
+address:
+  $newtype: $str
+tcp-stream:
+  $handle.read-write: null
+tcp-listener:
+  $handle.read: null
+udp-socket:
+  $handle.read-write: null
+stream-read:
+  $function:
+    stream: $tcp-stream
+  args:
+    limit: $uint64
+  return:
+    $result.result:
+      t: $bytes-lib.bytes
+      e: $fs.fs-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: fd_read_bytes_up_to
+      args:
+      - $args.stream
+      - $args.limit
+stream-write:
+  $function:
+    stream: $tcp-stream
+  args:
+    data: $bytes-lib.bytes
+  return:
+    $result.result:
+      t: $void
+      e: $fs.fs-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: fd_write_bytes
+      args:
+      - $args.stream
+      - $args.data
+close-stream:
+  $function:
+    stream: $tcp-stream
+  return:
+    $result.result:
+      t: $void
+      e: $fs.fs-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: fd_close
+      args:
+      - $args.stream
+close-listener:
+  $function:
+    listener: $tcp-listener
+  return:
+    $result.result:
+      t: $void
+      e: $fs.fs-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: fd_close
+      args:
+      - $args.listener
+close-udp:
+  $function:
+    socket: $udp-socket
+  return:
+    $result.result:
+      t: $void
+      e: $fs.fs-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: fd_close
+      args:
+      - $args.socket
+datagram:
+  $record:
+    data: $bytes-lib.bytes
+    from: $address
+parse-address:
+  $function:
+    input: $str
+  return:
+    $result.result:
+      t: $address
+      e: $net-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: net_address_parse
+      args:
+      - $args.input
+resolve:
   $function:
     input: $str
   args:
     capability: $connect-capability
   return:
     $result.result:
-      t: $void
+      t:
+        $array: $address
+      e: $net-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: net_resolve
+      args:
+      - $args.input
+      - $args.capability
+connect:
+  $function:
+    input: $address
+  args:
+    capability: $connect-capability
+  return:
+    $result.result:
+      t: $tcp-stream
       e: $net-error
   do:
   - $wasm:
@@ -27,12 +234,12 @@ connect:
       - $args.capability
 listen:
   $function:
-    input: $str
+    input: $address
   args:
     capability: $listen-capability
   return:
     $result.result:
-      t: $void
+      t: $tcp-listener
       e: $net-error
   do:
   - $wasm:
@@ -42,3 +249,167 @@ listen:
       args:
       - $args.input
       - $args.capability
+accept:
+  $function:
+    listener: $tcp-listener
+  return:
+    $result.result:
+      t: $tcp-stream
+      e: $net-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: net_accept
+      args:
+      - $args.listener
+stream-local-address:
+  $function:
+    resource: $tcp-stream
+  return:
+    $result.result:
+      t: $address
+      e: $net-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: net_local_address
+      args:
+      - $args.resource
+listener-local-address:
+  $function:
+    resource: $tcp-listener
+  return:
+    $result.result:
+      t: $address
+      e: $net-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: net_local_address
+      args:
+      - $args.resource
+udp-local-address:
+  $function:
+    resource: $udp-socket
+  return:
+    $result.result:
+      t: $address
+      e: $net-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: net_local_address
+      args:
+      - $args.resource
+set-deadline:
+  $function:
+    stream: $tcp-stream
+  args:
+    duration: $time.duration
+  return:
+    $result.result:
+      t: $void
+      e: $net-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: net_set_deadline
+      args:
+      - $args.stream
+      - $args.duration
+shutdown:
+  $function:
+    stream: $tcp-stream
+  args:
+    direction: $str
+  return:
+    $result.result:
+      t: $void
+      e: $net-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: net_shutdown
+      args:
+      - $args.stream
+      - $args.direction
+udp-bind:
+  $function:
+    input: $address
+  args:
+    capability: $listen-capability
+  return:
+    $result.result:
+      t: $udp-socket
+      e: $net-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: net_udp_bind
+      args:
+      - $args.input
+      - $args.capability
+udp-connect:
+  $function:
+    socket: $udp-socket
+  args:
+    target: $address
+    capability: $connect-capability
+  return:
+    $result.result:
+      t: $void
+      e: $net-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: net_udp_connect
+      args:
+      - $args.socket
+      - $args.target
+      - $args.capability
+udp-send-to:
+  $function:
+    socket: $udp-socket
+  args:
+    data: $bytes-lib.bytes
+    target: $address
+    capability: $connect-capability
+  return:
+    $result.result:
+      t: $uint64
+      e: $net-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: net_udp_send_to
+      args:
+      - $args.socket
+      - $args.data
+      - $args.target
+      - $args.capability
+udp-receive-from:
+  $function:
+    socket: $udp-socket
+  args:
+    limit: $uint64
+  return:
+    $result.result:
+      t: $datagram
+      e: $net-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: net_udp_recv_from
+      args:
+      - $args.socket
+      - $args.limit

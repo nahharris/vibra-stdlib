@@ -1,3 +1,5 @@
+option:
+  $import: ./option.vibra
 result:
   $enum:
     err: $e
@@ -5,3 +7,162 @@ result:
   =where:
     t: []
     e: []
+from-ok:
+  $function:
+    input: $t
+  return:
+    $result:
+      t: $t
+      e: $e
+  =where:
+    t: []
+    e: []
+  do:
+  - $return:
+      $result.ok: $args.input
+from-err:
+  $function:
+    input: $e
+  return:
+    $result:
+      t: $t
+      e: $e
+  =where:
+    t: []
+    e: []
+  do:
+  - $return:
+      $result.err: $args.input
+is-ok:
+  $function:
+    input:
+      $result:
+        t: $t
+        e: $e
+  return: $bool
+  =where:
+    t: []
+    e: []
+  do:
+  - $match: $args.input
+    when:
+    - case:
+        $result.ok:
+          $bind: ignored-value
+      do:
+      - $return: true
+    - case:
+        $result.err:
+          $bind: ignored-error
+      do:
+      - $return: false
+is-err:
+  $function:
+    input:
+      $result:
+        t: $t
+        e: $e
+  return: $bool
+  =where:
+    t: []
+    e: []
+  do:
+  - $match: $args.input
+    when:
+    - case:
+        $result.ok:
+          $bind: ignored-value
+      do:
+      - $return: false
+    - case:
+        $result.err:
+          $bind: ignored-error
+      do:
+      - $return: true
+unwrap-or:
+  $function:
+    input:
+      $result:
+        t: $t
+        e: $e
+  args:
+    default: $t
+  return: $t
+  =where:
+    t: []
+    e: []
+  do:
+  - $match: $args.input
+    when:
+    - case:
+        $result.ok:
+          $bind: value
+      do:
+      - $return: $value
+    - case:
+        $result.err:
+          $bind: ignored-error
+      do:
+      - $return: $args.default
+into-ok-option:
+  $function:
+    input:
+      $result:
+        t: $t
+        e: $e
+  return:
+    $option.option:
+      t: $t
+  =where:
+    t: []
+    e: []
+  do:
+  - $match: $args.input
+    when:
+    - case:
+        $result.ok:
+          $bind: value
+      do:
+      - $return:
+          $option.from-value:
+            t: $t
+            input: $value
+    - case:
+        $result.err:
+          $bind: ignored-error
+      do:
+      - $return:
+          $option.empty:
+            t: $t
+            ignored: false
+into-err-option:
+  $function:
+    input:
+      $result:
+        t: $t
+        e: $e
+  return:
+    $option.option:
+      t: $e
+  =where:
+    t: []
+    e: []
+  do:
+  - $match: $args.input
+    when:
+    - case:
+        $result.ok:
+          $bind: ignored-value
+      do:
+      - $return:
+          $option.empty:
+            t: $e
+            ignored: false
+    - case:
+        $result.err:
+          $bind: error
+      do:
+      - $return:
+          $option.from-value:
+            t: $e
+            input: $error
