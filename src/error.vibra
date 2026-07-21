@@ -28,7 +28,7 @@ no-context:
   do:
   - $return:
       $option.empty:
-        t: $error.context
+        t: $context
         ignored: false
 error:
   $interface:
