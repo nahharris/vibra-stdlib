@@ -88,3 +88,60 @@ unwrap-or:
         $option.none: null
       do:
       - $return: $args.default
+and:
+  $function:
+    input:
+      $option:
+        t: $t
+  args:
+    next:
+      $option:
+        t: $u
+  return:
+    $option:
+      t: $u
+  =where:
+    t: []
+    u: []
+  do:
+  - $match: $args.input
+    when:
+    - case:
+        $option.some:
+          $bind: ignored-value
+      do:
+      - $return: $args.next
+    - case:
+        $option.none: null
+      do:
+      - $return:
+          $option.empty:
+            t: $u
+            ignored: false
+or:
+  $function:
+    input:
+      $option:
+        t: $t
+  args:
+    fallback:
+      $option:
+        t: $t
+  return:
+    $option:
+      t: $t
+  =where:
+    t: []
+  do:
+  - $match: $args.input
+    when:
+    - case:
+        $option.some:
+          $bind: value
+      do:
+      - $return:
+          $option.some: $value
+    - case:
+        $option.none: null
+      do:
+      - $return: $args.fallback

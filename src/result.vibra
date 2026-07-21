@@ -166,3 +166,75 @@ into-err-option:
           $option.from-value:
             t: $e
             input: $error
+and:
+  $function:
+    input:
+      $result:
+        t: $t
+        e: $e
+  args:
+    next:
+      $result:
+        t: $u
+        e: $e
+  return:
+    $result:
+      t: $u
+      e: $e
+  =where:
+    t: []
+    u: []
+    e: []
+  do:
+  - $match: $args.input
+    when:
+    - case:
+        $result.ok:
+          $bind: ignored-value
+      do:
+      - $return: $args.next
+    - case:
+        $result.err:
+          $bind: error
+      do:
+      - $return:
+          $result.from-err:
+            t: $u
+            e: $e
+            input: $error
+or:
+  $function:
+    input:
+      $result:
+        t: $t
+        e: $e
+  args:
+    fallback:
+      $result:
+        t: $t
+        e: $f
+  return:
+    $result:
+      t: $t
+      e: $f
+  =where:
+    t: []
+    e: []
+    f: []
+  do:
+  - $match: $args.input
+    when:
+    - case:
+        $result.ok:
+          $bind: value
+      do:
+      - $return:
+          $result.from-ok:
+            t: $t
+            e: $f
+            input: $value
+    - case:
+        $result.err:
+          $bind: ignored-error
+      do:
+      - $return: $args.fallback

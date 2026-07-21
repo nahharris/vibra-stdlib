@@ -20,6 +20,33 @@ context:
     source:
       $option.option:
         t: $str
+no-source:
+  $function: $void
+  return:
+    $option.option:
+      t: $str
+  do:
+  - $return:
+      $option.empty:
+        t: $str
+        ignored: false
+make-context:
+  $function:
+    kind: $error-kind
+  args:
+    operation: $str
+    message: $str
+    source:
+      $option.option:
+        t: $str
+  return: $context
+  do:
+  - $return:
+      $record:
+        kind: $args.kind
+        operation: $args.operation
+        message: $args.message
+        source: $args.source
 error:
   $interface:
     kind:
