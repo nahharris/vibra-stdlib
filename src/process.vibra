@@ -172,10 +172,9 @@ output:
     stderr: $bytes-lib.bytes
 child:
   $handle.process: null
-run:
-  $function:
-    input: $str
-  args:
+command:
+  $record:
+    executable: $str
     arguments:
       $array: $str
     environment:
@@ -184,6 +183,10 @@ run:
         value: $str
     cwd: $str
     stdio: $stdio-policy
+run:
+  $function:
+    input: $command
+  args:
     capability: $run-capability
   return:
     $result.result:
@@ -196,23 +199,11 @@ run:
         name: process_run
       args:
       - $args.input
-      - $args.arguments
-      - $args.environment
-      - $args.cwd
-      - $args.stdio
       - $args.capability
 spawn:
   $function:
-    input: $str
+    input: $command
   args:
-    arguments:
-      $array: $str
-    environment:
-      $map:
-        key: $str
-        value: $str
-    cwd: $str
-    stdio: $stdio-policy
     capability: $run-capability
   return:
     $result.result:
@@ -225,10 +216,6 @@ spawn:
         name: process_spawn
       args:
       - $args.input
-      - $args.arguments
-      - $args.environment
-      - $args.cwd
-      - $args.stdio
       - $args.capability
 wait:
   $function:
