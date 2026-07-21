@@ -169,13 +169,13 @@ fs-error:
         do:
         - $return:
             $option.option.some:
-              $record:
+              $error-lib.make-context:
                 kind:
-                  $error-lib.error-kind.io: null
+                  $error-lib.error-kind.other: null
                 operation: filesystem
                 message: filesystem operation failed
                 source:
-                  $option.option.some: filesystem operation failed
+                  $error-lib.no-source: null
 error-kind:
   $function:
     input: $fs-error
