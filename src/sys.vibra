@@ -1,6 +1,70 @@
 capability:
   $capability.system-info: null
+result:
+  $import: ./result.vibra
+info-record:
+  $record:
+    operating-system: $str
+    architecture: $str
+    family: $str
+location-error:
+  $enum:
+    not-found: $void
+    permission-denied: $void
+    invalid-path: $void
+    io: $str
 info:
+  $function:
+    capability: $capability
+  return: $info-record
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: system_info
+      args:
+      - $args.capability
+args:
+  $function:
+    capability: $capability
+  return:
+    $array: $str
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: system_args
+      args:
+      - $args.capability
+current-dir:
+  $function:
+    capability: $capability
+  return:
+    $result.result:
+      t: $str
+      e: $location-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: system_current_dir
+      args:
+      - $args.capability
+executable:
+  $function:
+    capability: $capability
+  return:
+    $result.result:
+      t: $str
+      e: $location-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: system_executable
+      args:
+      - $args.capability
+temp-dir:
   $function:
     capability: $capability
   return: $str
@@ -8,6 +72,6 @@ info:
   - $wasm:
       import:
         module: vibra_v1
-        name: system_info
+        name: system_temp_dir
       args:
       - $args.capability

@@ -55,6 +55,32 @@ path:
             name: path_extension
           args:
           - $args.self
+    file-name:
+      $function: $self
+      return:
+        $option.option:
+          t: $str
+      do:
+      - $wasm:
+          import:
+            module: vibra_v1
+            name: path_file_name
+          args:
+          - $args.self
+    components:
+      $function: $self
+      return:
+        $result.result:
+          t:
+            $array: $str
+          e: $fs-error
+      do:
+      - $wasm:
+          import:
+            module: vibra_v1
+            name: path_components
+          args:
+          - $args.self
 fs-error:
   $enum:
     not-found: $void
@@ -67,10 +93,17 @@ fs-error:
     resource-closed: $void
     too-many-open-files: $void
     io: $str
+    limit-exceeded: $void
 read-capability:
   $capability.fs-read: null
 write-capability:
   $capability.fs-write: null
+directory-entry:
+  $record:
+    path: $path
+    name: $str
+    is-dir: $bool
+    size: $uint64
 readable:
   $interface:
     read-string:
@@ -90,6 +123,25 @@ readable:
         return:
           $result.result:
             t: $bytes-lib.bytes
+            e: $fs-error
+    read-bytes-up-to:
+      $fn-type:
+        args:
+          $record:
+            self: $self
+            limit: $uint64
+        return:
+          $result.result:
+            t: $bytes-lib.bytes
+            e: $fs-error
+    read-line:
+      $fn-type:
+        args:
+          $record:
+            self: $self
+        return:
+          $result.result:
+            t: $str
             e: $fs-error
 writable:
   $interface:
@@ -112,6 +164,16 @@ writable:
         return:
           $result.result:
             t: $void
+            e: $fs-error
+    write-bytes-some:
+      $fn-type:
+        args:
+          $record:
+            self: $self
+            b: $bytes-lib.bytes
+        return:
+          $result.result:
+            t: $uint64
             e: $fs-error
     flush:
       $fn-type:
@@ -185,6 +247,35 @@ read-file:
               name: fd_read_bytes
             args:
             - $args.self
+      read-bytes-up-to:
+        $function: $self
+        args:
+          limit: $uint64
+        return:
+          $result.result:
+            t: $bytes-lib.bytes
+            e: $fs-error
+        do:
+        - $wasm:
+            import:
+              module: vibra_v1
+              name: fd_read_bytes_up_to
+            args:
+            - $args.self
+            - $args.limit
+      read-line:
+        $function: $self
+        return:
+          $result.result:
+            t: $str
+            e: $fs-error
+        do:
+        - $wasm:
+            import:
+              module: vibra_v1
+              name: fd_read_line
+            args:
+            - $args.self
     $closeable:
       close:
         $function: $self
@@ -232,6 +323,22 @@ write-file:
             import:
               module: vibra_v1
               name: fd_write_bytes
+            args:
+            - $args.self
+            - $args.b
+      write-bytes-some:
+        $function: $self
+        args:
+          b: $bytes-lib.bytes
+        return:
+          $result.result:
+            t: $uint64
+            e: $fs-error
+        do:
+        - $wasm:
+            import:
+              module: vibra_v1
+              name: fd_write_bytes_some
             args:
             - $args.self
             - $args.b
@@ -295,6 +402,22 @@ append-file:
             import:
               module: vibra_v1
               name: fd_write_bytes
+            args:
+            - $args.self
+            - $args.b
+      write-bytes-some:
+        $function: $self
+        args:
+          b: $bytes-lib.bytes
+        return:
+          $result.result:
+            t: $uint64
+            e: $fs-error
+        do:
+        - $wasm:
+            import:
+              module: vibra_v1
+              name: fd_write_bytes_some
             args:
             - $args.self
             - $args.b
@@ -388,6 +511,35 @@ read-write-file:
               name: fd_read_bytes
             args:
             - $args.self
+      read-bytes-up-to:
+        $function: $self
+        args:
+          limit: $uint64
+        return:
+          $result.result:
+            t: $bytes-lib.bytes
+            e: $fs-error
+        do:
+        - $wasm:
+            import:
+              module: vibra_v1
+              name: fd_read_bytes_up_to
+            args:
+            - $args.self
+            - $args.limit
+      read-line:
+        $function: $self
+        return:
+          $result.result:
+            t: $str
+            e: $fs-error
+        do:
+        - $wasm:
+            import:
+              module: vibra_v1
+              name: fd_read_line
+            args:
+            - $args.self
     $writable:
       write-string:
         $function: $self
@@ -418,6 +570,22 @@ read-write-file:
             import:
               module: vibra_v1
               name: fd_write_bytes
+            args:
+            - $args.self
+            - $args.b
+      write-bytes-some:
+        $function: $self
+        args:
+          b: $bytes-lib.bytes
+        return:
+          $result.result:
+            t: $uint64
+            e: $fs-error
+        do:
+        - $wasm:
+            import:
+              module: vibra_v1
+              name: fd_write_bytes_some
             args:
             - $args.self
             - $args.b
@@ -690,3 +858,84 @@ canonicalize:
       args:
       - $args.input
       - $args.capability
+read-dir-entries:
+  $function:
+    input: $path
+  args:
+    capability: $read-capability
+  return:
+    $result.result:
+      t:
+        $array: $directory-entry
+      e: $fs-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: fs_read_dir_entries
+      args:
+      - $args.input
+      - $args.capability
+open-write-options:
+  $function:
+    input: $path
+  args:
+    create: $bool
+    create-new: $bool
+    truncate: $bool
+    capability: $write-capability
+  return:
+    $result.result:
+      t: $write-file
+      e: $fs-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: fs_open_write_options
+      args:
+      - $args.input
+      - $args.create
+      - $args.create-new
+      - $args.truncate
+      - $args.capability
+rename:
+  $function:
+    input: $path
+  args:
+    to: $path
+    capability: $write-capability
+  return:
+    $result.result:
+      t: $void
+      e: $fs-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: fs_rename
+      args:
+      - $args.input
+      - $args.to
+      - $args.capability
+copy:
+  $function:
+    input: $path
+  args:
+    to: $path
+    read-capability: $read-capability
+    write-capability: $write-capability
+  return:
+    $result.result:
+      t: $void
+      e: $fs-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: fs_copy
+      args:
+      - $args.input
+      - $args.to
+      - $args.read-capability
+      - $args.write-capability

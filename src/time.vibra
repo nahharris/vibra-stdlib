@@ -1,5 +1,26 @@
 capability:
   $capability.clock: null
+result:
+  $import: ./result.vibra
+duration:
+  $newtype: $uint64
+instant:
+  $newtype: $uint64
+time-error:
+  $enum:
+    overflow: $void
+    invalid-order: $void
+milliseconds:
+  $function:
+    value: $uint64
+  return: $duration
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: clock_duration_from_millis
+      args:
+      - $args.value
 now-unix-millis:
   $function:
     capability: $capability
@@ -10,4 +31,63 @@ now-unix-millis:
         module: vibra_v1
         name: clock_now_unix_millis
       args:
+      - $args.capability
+monotonic-now:
+  $function:
+    capability: $capability
+  return: $instant
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: clock_monotonic_millis
+      args:
+      - $args.capability
+duration-add:
+  $function:
+    left: $duration
+  args:
+    right: $duration
+  return:
+    $result.result:
+      t: $duration
+      e: $time-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: clock_duration_add
+      args:
+      - $args.left
+      - $args.right
+duration-between:
+  $function:
+    earlier: $instant
+  args:
+    later: $instant
+  return:
+    $result.result:
+      t: $duration
+      e: $time-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: clock_duration_between
+      args:
+      - $args.earlier
+      - $args.later
+sleep:
+  $function:
+    duration: $duration
+  args:
+    capability: $capability
+  return: $void
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: clock_sleep_millis
+      args:
+      - $args.duration
       - $args.capability

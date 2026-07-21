@@ -1,0 +1,44 @@
+option:
+  $import: ./option.vibra
+error-kind:
+  $enum:
+    not-found: $void
+    permission-denied: $void
+    already-exists: $void
+    invalid-input: $void
+    resource-closed: $void
+    resource-exhausted: $void
+    unavailable: $void
+    unsupported: $void
+    io: $void
+    other: $void
+context:
+  $record:
+    kind: $error-kind
+    operation: $str
+    message: $str
+    source:
+      $option.option:
+        t: $str
+error:
+  $interface:
+    kind:
+      $fn-type:
+        args:
+          $record:
+            self: $self
+        return: $error-kind
+    display:
+      $fn-type:
+        args:
+          $record:
+            self: $self
+        return: $str
+    context:
+      $fn-type:
+        args:
+          $record:
+            self: $self
+        return:
+          $option.option:
+            t: $context

@@ -1,19 +1,193 @@
+bytes-lib:
+  $import: ./bytes.vibra
+fs:
+  $import: ./fs.vibra
 result:
   $import: ./result.vibra
+error-lib:
+  $import: ./error.vibra
+error:
+  $import: ./error.vibra
+option:
+  $import: ./option.vibra
 process-error:
   $enum:
     permission-denied: $void
+    not-found: $void
+    invalid-input: $void
+    resource-closed: $void
+    resource-exhausted: $void
+    unavailable: $void
     unsupported: $str
+    io: $str
+  =impl:
+    $error.error:
+      kind:
+        $function: $self
+        return: $error-lib.error-kind
+        do:
+        - $match: $args.self
+          when:
+          - case:
+              $process-error.permission-denied: null
+            do:
+            - $return:
+                $error-lib.error-kind.permission-denied: null
+          - case:
+              $process-error.not-found: null
+            do:
+            - $return:
+                $error-lib.error-kind.not-found: null
+          - case:
+              $process-error.invalid-input: null
+            do:
+            - $return:
+                $error-lib.error-kind.invalid-input: null
+          - case:
+              $process-error.resource-closed: null
+            do:
+            - $return:
+                $error-lib.error-kind.resource-closed: null
+          - case:
+              $process-error.resource-exhausted: null
+            do:
+            - $return:
+                $error-lib.error-kind.resource-exhausted: null
+          - case:
+              $process-error.unavailable: null
+            do:
+            - $return:
+                $error-lib.error-kind.unavailable: null
+          - case:
+              $process-error.unsupported:
+                $wildcard: null
+            do:
+            - $return:
+                $error-lib.error-kind.unsupported: null
+          - case:
+              $process-error.io:
+                $wildcard: null
+            do:
+            - $return:
+                $error-lib.error-kind.io: null
+      display:
+        $function: $self
+        return: $str
+        do:
+        - $match: $args.self
+          when:
+          - case:
+              $process-error.permission-denied: null
+            do:
+            - $return: process permission denied
+          - case:
+              $process-error.not-found: null
+            do:
+            - $return: executable not found
+          - case:
+              $process-error.invalid-input: null
+            do:
+            - $return: invalid process input
+          - case:
+              $process-error.resource-closed: null
+            do:
+            - $return: child already waited or closed
+          - case:
+              $process-error.resource-exhausted: null
+            do:
+            - $return: process resource limit exceeded
+          - case:
+              $process-error.unavailable: null
+            do:
+            - $return: child pipe unavailable
+          - case:
+              $process-error.unsupported:
+                $bind: message
+            do:
+            - $return: $message
+          - case:
+              $process-error.io:
+                $bind: message
+            do:
+            - $return: $message
+      context:
+        $function: $self
+        return:
+          $option.option:
+            t: $error-lib.context
+        do:
+        - $match: $args.self
+          when:
+          - case:
+              $process-error.unsupported:
+                $bind: message
+            do:
+            - $return:
+                $option.option.some:
+                  $record:
+                    kind:
+                      $error-lib.error-kind.unsupported: null
+                    operation: process
+                    message: $message
+                    source:
+                      $option.option.some: $message
+          - case:
+              $process-error.io:
+                $bind: message
+            do:
+            - $return:
+                $option.option.some:
+                  $record:
+                    kind:
+                      $error-lib.error-kind.io: null
+                    operation: process
+                    message: $message
+                    source:
+                      $option.option.some: $message
+          - case:
+              $wildcard: null
+            do:
+            - $return:
+                $option.option.some:
+                  $record:
+                    kind:
+                      $error-lib.error-kind.other: null
+                    operation: process
+                    message: process operation failed
+                    source:
+                      $option.option.some: process operation failed
 run-capability:
   $capability.process-run: null
+stdio-policy:
+  $enum:
+    capture: $void
+    inherit: $void
+    'null': $void
+    stream: $void
+output:
+  $record:
+    success: $bool
+    code: $int64
+    stdout: $bytes-lib.bytes
+    stderr: $bytes-lib.bytes
+child:
+  $handle.process: null
 run:
   $function:
     input: $str
   args:
+    arguments:
+      $array: $str
+    environment:
+      $map:
+        key: $str
+        value: $str
+    cwd: $str
+    stdio: $stdio-policy
     capability: $run-capability
   return:
     $result.result:
-      t: $void
+      t: $output
       e: $process-error
   do:
   - $wasm:
@@ -22,4 +196,107 @@ run:
         name: process_run
       args:
       - $args.input
+      - $args.arguments
+      - $args.environment
+      - $args.cwd
+      - $args.stdio
       - $args.capability
+spawn:
+  $function:
+    input: $str
+  args:
+    arguments:
+      $array: $str
+    environment:
+      $map:
+        key: $str
+        value: $str
+    cwd: $str
+    stdio: $stdio-policy
+    capability: $run-capability
+  return:
+    $result.result:
+      t: $child
+      e: $process-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: process_spawn
+      args:
+      - $args.input
+      - $args.arguments
+      - $args.environment
+      - $args.cwd
+      - $args.stdio
+      - $args.capability
+wait:
+  $function:
+    input: $child
+  return:
+    $result.result:
+      t: $output
+      e: $process-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: process_wait
+      args:
+      - $args.input
+kill:
+  $function:
+    input: $child
+  return:
+    $result.result:
+      t: $void
+      e: $process-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: process_kill
+      args:
+      - $args.input
+stdin:
+  $function:
+    input: $child
+  return:
+    $result.result:
+      t: $fs.write-file
+      e: $process-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: process_child_stdin
+      args:
+      - $args.input
+stdout:
+  $function:
+    input: $child
+  return:
+    $result.result:
+      t: $fs.read-file
+      e: $process-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: process_child_stdout
+      args:
+      - $args.input
+stderr:
+  $function:
+    input: $child
+  return:
+    $result.result:
+      t: $fs.read-file
+      e: $process-error
+  do:
+  - $wasm:
+      import:
+        module: vibra_v1
+        name: process_child_stderr
+      args:
+      - $args.input
