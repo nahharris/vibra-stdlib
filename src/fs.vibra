@@ -4,6 +4,10 @@ result:
   $import: ./result.vibra
 option:
   $import: ./option.vibra
+error-lib:
+  $import: ./error.vibra
+error:
+  $import: ./error.vibra
 path:
   $newtype: $str
   =defs:
@@ -94,6 +98,84 @@ fs-error:
     too-many-open-files: $void
     io: $str
     limit-exceeded: $void
+  =impl:
+    $error.error:
+      kind:
+        $function: $self
+        return: $error-lib.error-kind
+        do:
+        - $match: $args.self
+          when:
+          - case:
+              $fs-error.not-found: null
+            do:
+            - $return:
+                $error-lib.error-kind.not-found: null
+          - case:
+              $fs-error.permission-denied: null
+            do:
+            - $return:
+                $error-lib.error-kind.permission-denied: null
+          - case:
+              $fs-error.already-exists: null
+            do:
+            - $return:
+                $error-lib.error-kind.already-exists: null
+          - case:
+              $fs-error.invalid-path: null
+            do:
+            - $return:
+                $error-lib.error-kind.invalid-input: null
+          - case:
+              $fs-error.resource-closed: null
+            do:
+            - $return:
+                $error-lib.error-kind.resource-closed: null
+          - case:
+              $fs-error.too-many-open-files: null
+            do:
+            - $return:
+                $error-lib.error-kind.resource-exhausted: null
+          - case:
+              $fs-error.limit-exceeded: null
+            do:
+            - $return:
+                $error-lib.error-kind.resource-exhausted: null
+          - case:
+              $wildcard: null
+            do:
+            - $return:
+                $error-lib.error-kind.io: null
+      display:
+        $function: $self
+        return: $str
+        do:
+        - $match: $args.self
+          when:
+          - case:
+              $fs-error.io:
+                $bind: message
+            do:
+            - $return: $message
+          - case:
+              $wildcard: null
+            do:
+            - $return: filesystem operation failed
+      context:
+        $function: $self
+        return:
+          $option.option:
+            t: $error-lib.context
+        do:
+        - $return:
+            $error-lib.no-context: null
+error-kind:
+  $function:
+    input: $fs-error
+  return: $error-lib.error-kind
+  do:
+  - $return:
+      $error.error.kind: $args.input
 read-capability:
   $capability.fs-read: null
 write-capability:

@@ -20,6 +20,16 @@ context:
     source:
       $option.option:
         t: $str
+no-context:
+  $function: $void
+  return:
+    $option.option:
+      t: $context
+  do:
+  - $return:
+      $option.empty:
+        t: $error.context
+        ignored: false
 error:
   $interface:
     kind:
